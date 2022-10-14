@@ -1,4 +1,8 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:taxi_booking/global.dart/global.dart';
+import 'package:taxi_booking/splash_screen/splash_screen.dart';
 
 class CarInfoScreen extends StatefulWidget {
   const CarInfoScreen({Key? key}) : super(key: key);
@@ -14,6 +18,25 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
 
   List<String> carType = ['uber-x', 'uber-go', 'bike'];
   String? selectedCarType;
+
+  saveCarInfo() {
+    Map driverCarInfoMap = {
+      "car_color": carColorController.text.trim(),
+      "car_number": carNumberController.text.trim(),
+      "car_model": carModelController.text.trim(),
+      "type": selectedCarType,
+    };
+    DatabaseReference driverRef =
+        FirebaseDatabase.instance.ref().child("drivers");
+    driverRef
+        .child(currentFirebaseUser!.uid)
+        .child("car_details")
+        .set(driverCarInfoMap);
+    Fluttertoast.showToast(msg: "Car Details Saved");
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const SplashScreen()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -141,10 +164,14 @@ class _CarInfoScreenState extends State<CarInfoScreen> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const CarInfoScreen()));
+                    if (carColorController.text.isNotEmpty &&
+                        carNumberController.text.isNotEmpty &&
+                        carModelController.text.isNotEmpty &&
+                        selectedCarType != null) {
+                      saveCarInfo();
+                      // Navigator.pushNamedAndRemoveUntil(
+                      //     context, "main_screen", (route) => false);
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red,
