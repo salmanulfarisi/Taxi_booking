@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:taxi_booking/authentication/signup_screen.dart';
+import 'package:taxi_booking/authentication/login_screen.dart';
 
 class AuthSelect extends StatefulWidget {
   const AuthSelect({Key? key}) : super(key: key);
@@ -55,7 +55,7 @@ class _AuthSelectState extends State<AuthSelect> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const SignupPage()));
+                        builder: (context) => const LoginScreen()));
               },
               style: ElevatedButton.styleFrom(
                 primary: Colors.red,
@@ -79,12 +79,7 @@ class _AuthSelectState extends State<AuthSelect> {
             width: 300,
             height: 50,
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SignupPage()));
-              },
+              onPressed: () {},
               style: ElevatedButton.styleFrom(
                 primary: Colors.red,
                 shape: RoundedRectangleBorder(

@@ -1,5 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:taxi_booking/authentication/signup_screen.dart';
+import 'package:taxi_booking/global.dart/global.dart';
+import 'package:taxi_booking/splash_screen/splash_screen.dart';
+import 'package:taxi_booking/widgets/progress_dialoge.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -11,6 +18,48 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  validateForm() {
+    if (!emailController.text.contains('@') && emailController.text.isEmpty) {
+      Fluttertoast.showToast(msg: 'Invalid Email');
+    } else if (passwordController.text.length < 6 &&
+        passwordController.text.isEmpty) {
+      Fluttertoast.showToast(msg: 'Password must be 6 characters');
+    } else {
+      loginDriverNow();
+    }
+  }
+
+  loginDriverNow() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return ProgressDialoge(message: 'Authenticating, Please wait...');
+      },
+    );
+    final User? firebaseUser = (await fauth
+            .signInWithEmailAndPassword(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    )
+            .catchError((msg) {
+      Navigator.pop(context);
+      Fluttertoast.showToast(msg: 'Error: $msg');
+    }))
+        .user;
+
+    if (firebaseUser != null) {
+      currentFirebaseUser = firebaseUser;
+      Fluttertoast.showToast(msg: 'Logged In');
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const SplashScreen()));
+    } else {
+      Fluttertoast.showToast(msg: 'Login Failed');
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,7 +133,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 20,
                 ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    validateForm();
+                  },
                   style: ElevatedButton.styleFrom(
                     primary: Colors.red,
                     padding: const EdgeInsets.symmetric(
